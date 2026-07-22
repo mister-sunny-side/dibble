@@ -2,7 +2,7 @@
 //! enum will render one of these components.
 //!
 //!
-//! The [`MeView`], [`DialogueView`], and [`MiscView`] components will be rendered when the current route matches
+//! The [`MapView`], [`AccountView`], and [`SocialFeedView`] components will be rendered when the current route matches
 //! their respective route variants.
 //!
 //!
@@ -12,11 +12,11 @@
 mod bottom_tab_layout;
 pub use bottom_tab_layout::BottomTabLayout;
 
-mod me_view;
-pub use me_view::MeView;
+mod map_view;
+pub use map_view::MapView;
 
-mod dialogue_view;
-pub use dialogue_view::DialogueView;
+mod account_view;
+pub use account_view::AccountView;
 
-mod misc_view;
-pub use misc_view::MiscView;
+mod social_feed_view;
+pub use social_feed_view::SocialFeedView;

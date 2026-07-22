@@ -18,31 +18,31 @@ pub fn BottomTabBar(active_tab: Signal<MainTab>, on_tab_change: EventHandler<Mai
             role: "tablist",
             aria_label: "Main navigation",
 
-            // Me tab (left, default)
+            // Social Feed tab (left)
             button {
-                class: if active_tab() == MainTab::Me { "tab-button active" } else { "tab-button" },
+                class: if active_tab() == MainTab::SocialFeed { "tab-button active" } else { "tab-button" },
                 role: "tab",
-                aria_selected: active_tab() == MainTab::Me,
-                onclick: move |_| on_tab_change.call(MainTab::Me),
-                "me"
+                aria_selected: active_tab() == MainTab::SocialFeed,
+                onclick: move |_| on_tab_change.call(MainTab::SocialFeed),
+                "Social Feed"
             }
 
-            // Dialogue tab (center)
+            // Map View tab (center)
             button {
-                class: if active_tab() == MainTab::Dialogue { "tab-button active" } else { "tab-button" },
+                class: if active_tab() == MainTab::MapView { "tab-button active" } else { "tab-button" },
                 role: "tab",
-                aria_selected: active_tab() == MainTab::Dialogue,
-                onclick: move |_| on_tab_change.call(MainTab::Dialogue),
-                "dialogue"
+                aria_selected: active_tab() == MainTab::MapView,
+                onclick: move |_| on_tab_change.call(MainTab::MapView),
+                "Map View"
             }
 
-            // Misc tab (right)
+            // Account tab (right)
             button {
-                class: if active_tab() == MainTab::Misc { "tab-button active" } else { "tab-button" },
+                class: if active_tab() == MainTab::Account { "tab-button active" } else { "tab-button" },
                 role: "tab",
-                aria_selected: active_tab() == MainTab::Misc,
-                onclick: move |_| on_tab_change.call(MainTab::Misc),
-                "misc"
+                aria_selected: active_tab() == MainTab::Account,
+                onclick: move |_| on_tab_change.call(MainTab::Account),
+                "Account"
             }
         }
     }

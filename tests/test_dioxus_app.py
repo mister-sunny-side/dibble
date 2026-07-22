@@ -2,7 +2,7 @@
 E2E validation tests for the Dioxus application.
 
 These tests validate that the core Dioxus app functionality is working:
-- Me page loads and displays content (default)
+- Map View page loads and displays content
 - Navigation between routes works
 - App is interactive and hydrated
 - Bottom tab bar navigation is functional
@@ -27,8 +27,8 @@ def build_url(base_url: str, path: str = "") -> str:
     return urljoin(normalized_base, normalized_path)
 
 
-def test_me_page_loads_and_displays_content(page: Page):
-    """Test that the Me page loads successfully and displays content."""
+def test_map_view_page_loads_and_displays_content(page: Page):
+    """Test that the Map View page loads successfully and displays content."""
     # Wait for the page to be fully loaded and hydrated
     page.wait_for_load_state("networkidle")
 
@@ -40,8 +40,8 @@ def test_me_page_loads_and_displays_content(page: Page):
     tab_bar = page.locator("#bottom-tab-bar")
     expect(tab_bar).to_be_visible()
 
-    # Check that Me page placeholder content is visible
-    heading = page.get_by_role("heading", name="me")
+    # Check that Map View placeholder content is visible
+    heading = page.get_by_role("heading", name="Map View")
     expect(heading).to_be_visible()
 
 
@@ -51,34 +51,34 @@ def test_bottom_tab_bar_navigation_works(page: Page, base_url: str):
     page.wait_for_load_state("networkidle")
 
     # Check that all three tabs exist and are visible
-    me_tab = page.get_by_role("tab", name="me")
-    expect(me_tab).to_be_visible()
+    map_tab = page.get_by_role("tab", name="Map View")
+    expect(map_tab).to_be_visible()
 
-    dialogue_tab = page.get_by_role("tab", name="dialogue")
-    expect(dialogue_tab).to_be_visible()
+    account_tab = page.get_by_role("tab", name="Account")
+    expect(account_tab).to_be_visible()
 
-    misc_tab = page.get_by_role("tab", name="misc")
-    expect(misc_tab).to_be_visible()
+    social_tab = page.get_by_role("tab", name="Social Feed")
+    expect(social_tab).to_be_visible()
 
-    # Click the Dialogue tab and verify navigation
-    dialogue_tab.click()
+    # Click the Account tab and verify navigation
+    account_tab.click()
     page.wait_for_load_state("networkidle")
 
-    # Verify URL changed to /dialogue
-    expect(page).to_have_url(build_url(base_url, "dialogue"))
+    # Verify URL changed to /account
+    expect(page).to_have_url(build_url(base_url, "account"))
 
-    # Click the Misc tab
-    misc_tab.click()
+    # Click the Social Feed tab
+    social_tab.click()
     page.wait_for_load_state("networkidle")
 
-    # Verify URL changed to /misc
-    expect(page).to_have_url(build_url(base_url, "misc"))
+    # Verify URL changed to /social
+    expect(page).to_have_url(build_url(base_url, "social"))
 
-    # Navigate back to Me
-    me_tab.click()
+    # Navigate back to Map View
+    map_tab.click()
     page.wait_for_load_state("networkidle")
 
-    # Verify we're back on Me page
+    # Verify we're back on Map View page
     expect(page).to_have_url(build_url(base_url))
 
 
@@ -94,56 +94,56 @@ def test_app_is_fully_hydrated(page: Page, base_url: str):
     # Try interacting with the page to ensure Dioxus hydration worked
     # Click on a tab to ensure events are working
     tab_bar = page.locator("#bottom-tab-bar")
-    dialogue_tab = page.get_by_role("tab", name="dialogue")
-    dialogue_tab.click()
+    account_tab = page.get_by_role("tab", name="Account")
+    account_tab.click()
     page.wait_for_load_state("networkidle")
 
     # Verify the tab bar is still visible after interaction
     expect(tab_bar).to_be_visible()
 
     # Verify navigation actually worked
-    expect(page).to_have_url(build_url(base_url, "dialogue"))
+    expect(page).to_have_url(build_url(base_url, "account"))
 
 
-def test_dialogue_route_works(page: Page, base_url: str):
-    """Test that the dialogue route works."""
-    # Navigate directly to dialogue route
-    page.goto(build_url(base_url, "dialogue"))
+def test_account_route_works(page: Page, base_url: str):
+    """Test that the account route works."""
+    # Navigate directly to account route
+    page.goto(build_url(base_url, "account"))
     page.wait_for_load_state("networkidle")
 
-    # Verify we're on the dialogue page
-    expect(page).to_have_url(build_url(base_url, "dialogue"))
+    # Verify we're on the account page
+    expect(page).to_have_url(build_url(base_url, "account"))
 
     # Verify tab bar is still present (layout should work)
     tab_bar = page.locator("#bottom-tab-bar")
     expect(tab_bar).to_be_visible()
 
-    # Verify Dialogue tab is active
-    dialogue_tab = page.get_by_role("tab", name="dialogue")
-    expect(dialogue_tab).to_have_attribute("aria-selected", "true")
+    # Verify Account tab is active
+    account_tab = page.get_by_role("tab", name="Account")
+    expect(account_tab).to_have_attribute("aria-selected", "true")
 
 
 def test_routing_system_works(page: Page, base_url: str):
     """Test that the Dioxus routing system works end-to-end."""
-    # Start on Me (default route)
+    # Start on Map View (default route)
     page.goto(build_url(base_url))
     page.wait_for_load_state("networkidle")
     expect(page).to_have_url(build_url(base_url))
 
-    # Navigate to Dialogue via tab
-    dialogue_tab = page.get_by_role("tab", name="dialogue")
-    dialogue_tab.click()
+    # Navigate to Account via tab
+    account_tab = page.get_by_role("tab", name="Account")
+    account_tab.click()
     page.wait_for_load_state("networkidle")
-    expect(page).to_have_url(build_url(base_url, "dialogue"))
+    expect(page).to_have_url(build_url(base_url, "account"))
 
-    # Navigate to Misc via tab
-    misc_tab = page.get_by_role("tab", name="misc")
-    misc_tab.click()
+    # Navigate to Social Feed via tab
+    social_tab = page.get_by_role("tab", name="Social Feed")
+    social_tab.click()
     page.wait_for_load_state("networkidle")
-    expect(page).to_have_url(build_url(base_url, "misc"))
+    expect(page).to_have_url(build_url(base_url, "social"))
 
-    # Navigate back to Me via tab
-    me_tab = page.get_by_role("tab", name="me")
-    me_tab.click()
+    # Navigate back to Map View via tab
+    map_tab = page.get_by_role("tab", name="Map View")
+    map_tab.click()
     page.wait_for_load_state("networkidle")
     expect(page).to_have_url(build_url(base_url))

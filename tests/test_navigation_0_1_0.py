@@ -1,9 +1,9 @@
 """
-E2E tests for Navigation Foundation specification.
+E2E tests for Navigation Foundation (0.1.0) specification.
 
 These tests validate the bottom tab bar navigation system:
 - Bottom tab bar renders and is fixed at bottom
-- All three tabs (me, dialogue, misc) are present and clickable
+- All three tabs are present and clickable
 - Tab navigation updates URL correctly
 - Active tab indicator updates correctly
 - Deep linking works for all three routes
@@ -51,41 +51,41 @@ def test_all_three_tabs_are_present(page: Page):
     """Test that all three tabs are present and visible."""
     page.wait_for_load_state("networkidle")
 
-    # Check for me tab
-    me_tab = page.get_by_role("tab", name="me")
-    expect(me_tab).to_be_visible()
+    # Check for Social Feed tab
+    social_tab = page.get_by_role("tab", name="Social Feed")
+    expect(social_tab).to_be_visible()
 
-    # Check for dialogue tab
-    dialogue_tab = page.get_by_role("tab", name="dialogue")
-    expect(dialogue_tab).to_be_visible()
+    # Check for Map View tab
+    map_tab = page.get_by_role("tab", name="Map View")
+    expect(map_tab).to_be_visible()
 
-    # Check for misc tab
-    misc_tab = page.get_by_role("tab", name="misc")
-    expect(misc_tab).to_be_visible()
+    # Check for Account tab
+    account_tab = page.get_by_role("tab", name="Account")
+    expect(account_tab).to_be_visible()
 
 
 def test_tab_navigation_updates_url(page: Page, base_url: str):
     """Test that clicking tabs navigates to the correct routes and updates URL."""
     page.wait_for_load_state("networkidle")
 
-    # Start on me (default route)
+    # Start on Map View (default route)
     expect(page).to_have_url(build_url(base_url))
 
-    # Click dialogue tab
-    dialogue_tab = page.get_by_role("tab", name="dialogue")
-    dialogue_tab.click()
+    # Click Social Feed tab
+    social_tab = page.get_by_role("tab", name="Social Feed")
+    social_tab.click()
     page.wait_for_load_state("networkidle")
-    expect(page).to_have_url(build_url(base_url, "dialogue"))
+    expect(page).to_have_url(build_url(base_url, "social"))
 
-    # Click misc tab
-    misc_tab = page.get_by_role("tab", name="misc")
-    misc_tab.click()
+    # Click Account tab
+    account_tab = page.get_by_role("tab", name="Account")
+    account_tab.click()
     page.wait_for_load_state("networkidle")
-    expect(page).to_have_url(build_url(base_url, "misc"))
+    expect(page).to_have_url(build_url(base_url, "account"))
 
-    # Click me tab
-    me_tab = page.get_by_role("tab", name="me")
-    me_tab.click()
+    # Click Map View tab
+    map_tab = page.get_by_role("tab", name="Map View")
+    map_tab.click()
     page.wait_for_load_state("networkidle")
     expect(page).to_have_url(build_url(base_url))
 
@@ -94,112 +94,112 @@ def test_active_tab_indicator(page: Page):
     """Test that the active tab has a visual indicator and updates correctly."""
     page.wait_for_load_state("networkidle")
 
-    # Initially me should be active
-    me_tab = page.get_by_role("tab", name="me")
-    expect(me_tab).to_have_attribute("aria-selected", "true")
-    expect(me_tab).to_have_class(re.compile("active"))
+    # Initially Map View should be active
+    map_tab = page.get_by_role("tab", name="Map View")
+    expect(map_tab).to_have_attribute("aria-selected", "true")
+    expect(map_tab).to_have_class(re.compile("active"))
 
-    # Click dialogue tab
-    dialogue_tab = page.get_by_role("tab", name="dialogue")
-    dialogue_tab.click()
+    # Click Social Feed tab
+    social_tab = page.get_by_role("tab", name="Social Feed")
+    social_tab.click()
     page.wait_for_load_state("networkidle")
 
-    # Dialogue should now be active
-    expect(dialogue_tab).to_have_attribute("aria-selected", "true")
-    expect(dialogue_tab).to_have_class(re.compile("active"))
+    # Social Feed should now be active
+    expect(social_tab).to_have_attribute("aria-selected", "true")
+    expect(social_tab).to_have_class(re.compile("active"))
 
-    # me should no longer be active
-    expect(me_tab).to_have_attribute("aria-selected", "false")
-    expect(me_tab).not_to_have_class(re.compile("active"))
+    # Map View should no longer be active
+    expect(map_tab).to_have_attribute("aria-selected", "false")
+    expect(map_tab).not_to_have_class(re.compile("active"))
 
-    # Click misc tab
-    misc_tab = page.get_by_role("tab", name="misc")
-    misc_tab.click()
+    # Click Account tab
+    account_tab = page.get_by_role("tab", name="Account")
+    account_tab.click()
     page.wait_for_load_state("networkidle")
 
-    # Misc should now be active
-    expect(misc_tab).to_have_attribute("aria-selected", "true")
-    expect(misc_tab).to_have_class(re.compile("active"))
+    # Account should now be active
+    expect(account_tab).to_have_attribute("aria-selected", "true")
+    expect(account_tab).to_have_class(re.compile("active"))
 
-    # Dialogue should no longer be active
-    expect(dialogue_tab).to_have_attribute("aria-selected", "false")
-    expect(dialogue_tab).not_to_have_class(re.compile("active"))
+    # Social Feed should no longer be active
+    expect(social_tab).to_have_attribute("aria-selected", "false")
+    expect(social_tab).not_to_have_class(re.compile("active"))
 
 
 def test_deep_linking_map_view(page: Page, base_url: str):
-    """Test that navigating directly to / sets me tab as active."""
+    """Test that navigating directly to / sets Map View tab as active."""
     page.goto(build_url(base_url))
     page.wait_for_load_state("networkidle")
 
     expect(page).to_have_url(build_url(base_url))
 
-    me_tab = page.get_by_role("tab", name="me")
-    expect(me_tab).to_have_attribute("aria-selected", "true")
-    expect(me_tab).to_have_class(re.compile("active"))
+    map_tab = page.get_by_role("tab", name="Map View")
+    expect(map_tab).to_have_attribute("aria-selected", "true")
+    expect(map_tab).to_have_class(re.compile("active"))
 
 
 def test_deep_linking_account(page: Page, base_url: str):
-    """Test that navigating directly to /dialogue sets dialogue tab as active."""
-    page.goto(build_url(base_url, "dialogue"))
+    """Test that navigating directly to /account sets Account tab as active."""
+    page.goto(build_url(base_url, "account"))
     page.wait_for_load_state("networkidle")
 
-    expect(page).to_have_url(build_url(base_url, "dialogue"))
+    expect(page).to_have_url(build_url(base_url, "account"))
 
-    dialogue_tab = page.get_by_role("tab", name="dialogue")
-    expect(dialogue_tab).to_have_attribute("aria-selected", "true")
-    expect(dialogue_tab).to_have_class(re.compile("active"))
+    account_tab = page.get_by_role("tab", name="Account")
+    expect(account_tab).to_have_attribute("aria-selected", "true")
+    expect(account_tab).to_have_class(re.compile("active"))
 
 
 def test_deep_linking_social_feed(page: Page, base_url: str):
-    """Test that navigating directly to /misc sets misc tab as active."""
-    page.goto(build_url(base_url, "misc"))
+    """Test that navigating directly to /social sets Social Feed tab as active."""
+    page.goto(build_url(base_url, "social"))
     page.wait_for_load_state("networkidle")
 
-    expect(page).to_have_url(build_url(base_url, "misc"))
+    expect(page).to_have_url(build_url(base_url, "social"))
 
-    misc_tab = page.get_by_role("tab", name="misc")
-    expect(misc_tab).to_have_attribute("aria-selected", "true")
-    expect(misc_tab).to_have_class(re.compile("active"))
+    social_tab = page.get_by_role("tab", name="Social Feed")
+    expect(social_tab).to_have_attribute("aria-selected", "true")
+    expect(social_tab).to_have_class(re.compile("active"))
 
 
 def test_map_view_placeholder_displays(page: Page):
-    """Test that me page placeholder content is visible."""
+    """Test that Map View placeholder content is visible."""
     page.wait_for_load_state("networkidle")
 
     # Check for placeholder heading
-    heading = page.get_by_role("heading", name="me")
+    heading = page.get_by_role("heading", name="Map View")
     expect(heading).to_be_visible()
 
     # Check for placeholder description
-    description = page.get_by_text("Personal content will appear here")
+    description = page.get_by_text("Restaurant map will appear here")
     expect(description).to_be_visible()
 
 
 def test_account_view_placeholder_displays(page: Page, base_url: str):
-    """Test that dialogue page placeholder content is visible."""
-    page.goto(build_url(base_url, "dialogue"))
+    """Test that Account View placeholder content is visible."""
+    page.goto(build_url(base_url, "account"))
     page.wait_for_load_state("networkidle")
 
     # Check for placeholder heading
-    heading = page.get_by_role("heading", name="dialogue")
+    heading = page.get_by_role("heading", name="Account")
     expect(heading).to_be_visible()
 
     # Check for placeholder description
-    description = page.get_by_text("Blog posts will appear here")
+    description = page.get_by_text("Profile and settings will appear here")
     expect(description).to_be_visible()
 
 
 def test_social_feed_view_placeholder_displays(page: Page, base_url: str):
-    """Test that misc page placeholder content is visible."""
-    page.goto(build_url(base_url, "misc"))
+    """Test that Social Feed View placeholder content is visible."""
+    page.goto(build_url(base_url, "social"))
     page.wait_for_load_state("networkidle")
 
     # Check for placeholder heading
-    heading = page.get_by_role("heading", name="misc")
+    heading = page.get_by_role("heading", name="Social Feed")
     expect(heading).to_be_visible()
 
     # Check for placeholder description
-    description = page.get_by_text("Miscellaneous content will appear here")
+    description = page.get_by_text("Friends' reviews and recommendations will appear here")
     expect(description).to_be_visible()
 
 
@@ -224,8 +224,8 @@ def test_only_one_tab_active_at_a_time(page: Page):
     assert active_count == 1, f"Expected exactly 1 active tab, but found {active_count}"
 
     # Click another tab
-    dialogue_tab = page.get_by_role("tab", name="dialogue")
-    dialogue_tab.click()
+    social_tab = page.get_by_role("tab", name="Social Feed")
+    social_tab.click()
     page.wait_for_load_state("networkidle")
 
     # Verify still only one active tab

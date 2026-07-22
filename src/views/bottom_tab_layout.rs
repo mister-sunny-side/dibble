@@ -15,15 +15,15 @@ const BOTTOM_TAB_LAYOUT_CSS: Asset = asset!("/assets/styling/bottom_tab_layout.c
 #[component]
 pub fn BottomTabLayout() -> Element {
     let router = router();
-    let mut active_tab = use_signal(|| MainTab::Me);
+    let mut active_tab = use_signal(|| MainTab::MapView);
 
     // Sync tab state with current route
     use_effect(move || {
         let current_route = router.current::<Route>();
         match current_route {
-            Route::MeView { .. } => *active_tab.write() = MainTab::Me,
-            Route::DialogueView { .. } => *active_tab.write() = MainTab::Dialogue,
-            Route::MiscView { .. } => *active_tab.write() = MainTab::Misc,
+            Route::MapView { .. } => *active_tab.write() = MainTab::MapView,
+            Route::AccountView { .. } => *active_tab.write() = MainTab::Account,
+            Route::SocialFeedView { .. } => *active_tab.write() = MainTab::SocialFeed,
         }
     });
 
@@ -32,14 +32,14 @@ pub fn BottomTabLayout() -> Element {
         let tab_clone = tab.clone();
         *active_tab.write() = tab;
         match tab_clone {
-            MainTab::Me => {
-                router.push(Route::MeView {});
+            MainTab::MapView => {
+                router.push(Route::MapView {});
             }
-            MainTab::Dialogue => {
-                router.push(Route::DialogueView {});
+            MainTab::Account => {
+                router.push(Route::AccountView {});
             }
-            MainTab::Misc => {
-                router.push(Route::MiscView {});
+            MainTab::SocialFeed => {
+                router.push(Route::SocialFeedView {});
             }
         }
     };
