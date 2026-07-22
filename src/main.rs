@@ -2,7 +2,7 @@
 // need dioxus
 use dioxus::prelude::*;
 
-use views::{AccountView, BottomTabLayout, MapView, SocialFeedView};
+use views::{BottomTabLayout, DialogueView, MeView, MiscView};
 
 /// Define a components module that contains all shared components for our app.
 mod components;
@@ -12,9 +12,9 @@ mod views;
 /// MainTab enum represents the three main tabs in the bottom navigation bar.
 #[derive(Debug, Clone, PartialEq)]
 pub enum MainTab {
-    SocialFeed,
-    MapView,
-    Account,
+    Me,
+    Dialogue,
+    Misc,
 }
 
 /// The Route enum is used to define the structure of internal routes in our app. All route enums need to derive
@@ -32,11 +32,11 @@ enum Route {
         // The route attribute defines the URL pattern that a specific route matches. If that pattern matches the URL,
         // the component for that route will be rendered. The component name that is rendered defaults to the variant name.
         #[route("/")]
-        MapView {},
-        #[route("/account")]
-        AccountView {},
-        #[route("/social")]
-        SocialFeedView {},
+        MeView {},
+        #[route("/dialogue")]
+        DialogueView {},
+        #[route("/misc")]
+        MiscView {},
 }
 
 // We can import assets in dioxus with the `asset!` macro. This macro takes a path to an asset relative to the crate root.

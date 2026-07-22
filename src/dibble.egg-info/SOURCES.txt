@@ -1,0 +1,10 @@
+README.md
+pyproject.toml
+src/dibble.egg-info/PKG-INFO
+src/dibble.egg-info/SOURCES.txt
+src/dibble.egg-info/dependency_links.txt
+src/dibble.egg-info/requires.txt
+src/dibble.egg-info/top_level.txt
+tests/test_dioxus_app.py
+tests/test_example.py
+tests/test_navigation_0_1_0.py

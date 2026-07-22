@@ -1,0 +1,11 @@
+Metadata-Version: 2.4
+Name: dibble
+Version: 0.1.0
+Summary: Add your description here
+Requires-Python: >=3.12
+Provides-Extra: dev
+Requires-Dist: playwright>=1.40.0; extra == "dev"
+Requires-Dist: pytest>=7.4.0; extra == "dev"
+Requires-Dist: pytest-playwright>=0.4.0; extra == "dev"
+Requires-Dist: ruff>=0.1.0; extra == "dev"
+Requires-Dist: pre-commit>=3.0.0; extra == "dev"
