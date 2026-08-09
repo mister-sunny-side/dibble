@@ -22,3 +22,7 @@ dmypy.json
 playwright-report/
 test-results/
 playwright/.cache/
+
+# Resy data
+data/
+!data/.gitkeep

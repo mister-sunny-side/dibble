@@ -18,7 +18,7 @@ pub fn BottomTabBar(active_tab: Signal<MainTab>, on_tab_change: EventHandler<Mai
             role: "tablist",
             aria_label: "Main navigation",
 
-            // Social Feed tab (left)
+            // Social Feed tab
             button {
                 class: if active_tab() == MainTab::SocialFeed { "tab-button active" } else { "tab-button" },
                 role: "tab",
@@ -27,7 +27,7 @@ pub fn BottomTabBar(active_tab: Signal<MainTab>, on_tab_change: EventHandler<Mai
                 "Social Feed"
             }
 
-            // Map View tab (center)
+            // Map View tab
             button {
                 class: if active_tab() == MainTab::MapView { "tab-button active" } else { "tab-button" },
                 role: "tab",
@@ -36,7 +36,16 @@ pub fn BottomTabBar(active_tab: Signal<MainTab>, on_tab_change: EventHandler<Mai
                 "Map View"
             }
 
-            // Account tab (right)
+            // Resy tab
+            button {
+                class: if active_tab() == MainTab::Resy { "tab-button active" } else { "tab-button" },
+                role: "tab",
+                aria_selected: active_tab() == MainTab::Resy,
+                onclick: move |_| on_tab_change.call(MainTab::Resy),
+                "Resy"
+            }
+
+            // Account tab
             button {
                 class: if active_tab() == MainTab::Account { "tab-button active" } else { "tab-button" },
                 role: "tab",

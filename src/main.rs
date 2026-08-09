@@ -2,18 +2,21 @@
 // need dioxus
 use dioxus::prelude::*;
 
-use views::{AccountView, BottomTabLayout, MapView, SocialFeedView};
+use views::{AccountView, BottomTabLayout, MapView, ResyView, SocialFeedView};
 
 /// Define a components module that contains all shared components for our app.
 mod components;
 /// Define a views module that contains the UI for all Layouts and Routes for our app.
 mod views;
+/// Define a resy module that contains the Resy API client and reservation polling daemon.
+mod resy;
 
-/// MainTab enum represents the three main tabs in the bottom navigation bar.
+/// MainTab enum represents the four main tabs in the bottom navigation bar.
 #[derive(Debug, Clone, PartialEq)]
 pub enum MainTab {
     SocialFeed,
     MapView,
+    Resy,
     Account,
 }
 
@@ -33,6 +36,8 @@ enum Route {
         // the component for that route will be rendered. The component name that is rendered defaults to the variant name.
         #[route("/")]
         MapView {},
+        #[route("/resy")]
+        ResyView {},
         #[route("/account")]
         AccountView {},
         #[route("/social")]
