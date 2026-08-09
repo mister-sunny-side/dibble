@@ -1,4 +1,5 @@
 use crate::resy::client::ResyClient;
+use crate::resy::mock_client::MockResyClient;
 use crate::resy::error::{ResyError, ResyResult};
 use crate::resy::types::*;
 use chrono::{DateTime, Utc};
@@ -12,14 +13,56 @@ const SEARCH_CRITERIA_TREE: &str = "search_criteria";
 const POLLING_RESULTS_TREE: &str = "polling_results";
 const POLL_INTERVAL_MINUTES: u64 = 5;
 
+pub enum ResyClientType {
+    Real(ResyClient),
+    Mock(MockResyClient),
+}
+
+impl ResyClientType {
+    async fn authenticate(&mut self) -> ResyResult<String> {
+        match self {
+            ResyClientType::Real(client) => client.authenticate().await,
+            ResyClientType::Mock(client) => client.authenticate().await,
+        }
+    }
+
+    async fn search_venues(&self, request: SearchVenuesRequest) -> ResyResult<Vec<Venue>> {
+        match self {
+            ResyClientType::Real(client) => client.search_venues(request).await,
+            ResyClientType::Mock(client) => client.search_venues(request).await,
+        }
+    }
+
+    async fn find_availability(&self, request: FindAvailabilityRequest) -> ResyResult<Vec<TimeSlot>> {
+        match self {
+            ResyClientType::Real(client) => client.find_availability(request).await,
+            ResyClientType::Mock(client) => client.find_availability(request).await,
+        }
+    }
+
+    async fn get_booking_details(&self, config_id: &str, day: &str, party_size: u32) -> ResyResult<BookingDetailsResponse> {
+        match self {
+            ResyClientType::Real(client) => client.get_booking_details(config_id, day, party_size).await,
+            ResyClientType::Mock(client) => client.get_booking_details(config_id, day, party_size).await,
+        }
+    }
+
+    async fn book_reservation(&self, book_token: &str, payment_method_id: u64) -> ResyResult<BookReservationResponse> {
+        match self {
+            ResyClientType::Real(client) => client.book_reservation(book_token, payment_method_id).await,
+            ResyClientType::Mock(client) => client.book_reservation(book_token, payment_method_id).await,
+        }
+    }
+}
+
 pub struct ResyDaemon {
-    client: Arc<ResyClient>,
+    client: Arc<ResyClientType>,
     db: Db,
     running: Arc<tokio::sync::RwLock<bool>>,
 }
 
 impl ResyDaemon {
-    pub fn new(client: ResyClient, db_path: &str) -> ResyResult<Self> {
+    pub fn new(client: ResyClientType, db_path: &str) -> ResyResult<Self> {
         let db = sled::open(db_path)
             .map_err(|e| ResyError::DatabaseError(format!("Failed to open database: {}", e)))?;
 
@@ -28,6 +71,15 @@ impl ResyDaemon {
             db,
             running: Arc::new(tokio::sync::RwLock::new(false)),
         })
+    }
+
+    pub fn new_with_mock(config: ResyConfig, db_path: &str) -> ResyResult<Self> {
+        let mock_client = MockResyClient::new(config);
+        Self::new(ResyClientType::Mock(mock_client), db_path)
+    }
+
+    pub fn new_with_real(client: ResyClient, db_path: &str) -> ResyResult<Self> {
+        Self::new(ResyClientType::Real(client), db_path)
     }
 
     pub async fn start(&self) -> ResyResult<()> {
@@ -73,7 +125,7 @@ impl ResyDaemon {
         Ok(())
     }
 
-    async fn poll_reservations(client: &ResyClient, db: &Db) -> ResyResult<()> {
+    async fn poll_reservations(client: &ResyClientType, db: &Db) -> ResyResult<()> {
         info!("Starting polling cycle");
 
         let search_criteria = Self::load_active_searches(db)?;
@@ -98,7 +150,7 @@ impl ResyDaemon {
     }
 
     async fn process_search(
-        client: &ResyClient,
+        client: &ResyClientType,
         db: &Db,
         criteria: &SearchCriteria,
     ) -> ResyResult<()> {
@@ -194,7 +246,7 @@ impl ResyDaemon {
     }
 
     async fn attempt_booking(
-        client: &ResyClient,
+        client: &ResyClientType,
         db: &Db,
         criteria: &SearchCriteria,
         slot: &TimeSlot,

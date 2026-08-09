@@ -1,5 +1,6 @@
 use crate::resy::client::ResyClient;
-use crate::resy::daemon::ResyDaemon;
+use crate::resy::daemon::{ResyClientType, ResyDaemon};
+use crate::resy::mock_client::MockResyClient;
 use crate::resy::types::*;
 use dioxus::prelude::*;
 use std::sync::{Arc, Mutex};
@@ -132,7 +133,7 @@ pub async fn initialize_daemon(
     config.email = Some(email);
     config.password = Some(password);
 
-    let mut client = ResyClient::new(config).map_err(|e| ServerFnError::new(e.to_string()))?;
+    let mut client = ResyClient::new(config.clone()).map_err(|e| ServerFnError::new(e.to_string()))?;
     
     let token = client
         .authenticate()
@@ -141,7 +142,7 @@ pub async fn initialize_daemon(
 
     config.auth_token = Some(token.clone());
     
-    let daemon = ResyDaemon::new(client, "./data/resy.db")
+    let daemon = ResyDaemon::new_with_real(client, "./data/resy.db")
         .map_err(|e| ServerFnError::new(e.to_string()))?;
 
     daemon
@@ -153,6 +154,51 @@ pub async fn initialize_daemon(
     *daemon_lock = Some(daemon);
 
     Ok(token)
+}
+
+#[server(InitializeMockDaemon)]
+pub async fn initialize_mock_daemon(
+    email: String,
+) -> Result<String, ServerFnError> {
+    let mut config = ResyConfig::default();
+    config.email = Some(email);
+    config.password = Some("mock_password".to_string());
+
+    let daemon = ResyDaemon::new_with_mock(config, "./data/resy_mock.db")
+        .map_err(|e| ServerFnError::new(e.to_string()))?;
+
+    daemon
+        .start()
+        .await
+        .map_err(|e| ServerFnError::new(e.to_string()))?;
+
+    let mut daemon_lock = DAEMON.lock().unwrap();
+    *daemon_lock = Some(daemon);
+
+    Ok("mock_auth_token_12345".to_string())
+}
+
+#[server(SearchVenuesMock)]
+pub async fn search_venues_mock(
+    query: String,
+) -> Result<Vec<Venue>, ServerFnError> {
+    let config = ResyConfig::default();
+    let client = MockResyClient::new(config);
+
+    let request = SearchVenuesRequest {
+        query,
+        per_page: Some(20),
+        types: vec!["venue".to_string()],
+        geo: None,
+        slot_filter: None,
+    };
+
+    let venues = client
+        .search_venues(request)
+        .await
+        .map_err(|e| ServerFnError::new(e.to_string()))?;
+
+    Ok(venues)
 }
 
 #[server(StopDaemon)]

@@ -7,6 +7,7 @@ use crate::resy::types::*;
 #[component]
 pub fn ResyView() -> Element {
     let mut auth_status = use_signal(|| false);
+    let mut test_mode = use_signal(|| false);
     let mut email = use_signal(|| String::new());
     let mut password = use_signal(|| String::new());
     let mut search_query = use_signal(|| String::new());
@@ -32,11 +33,42 @@ pub fn ResyView() -> Element {
         });
     };
 
-    let search_restaurants = move |_| {
+    let authenticate_test_mode = move |_| {
         spawn(async move {
             #[cfg(feature = "server")]
             {
-                match search_venues(search_query(), None, None).await {
+                let test_email = if email().is_empty() {
+                    "test@example.com".to_string()
+                } else {
+                    email()
+                };
+
+                match initialize_mock_daemon(test_email).await {
+                    Ok(_) => {
+                        auth_status.set(true);
+                        test_mode.set(true);
+                        error_message.set(None);
+                    }
+                    Err(e) => {
+                        error_message.set(Some(format!("Test mode initialization failed: {}", e)));
+                    }
+                }
+            }
+        });
+    };
+
+    let search_restaurants = move |_| {
+        let is_test = test_mode();
+        spawn(async move {
+            #[cfg(feature = "server")]
+            {
+                let result = if is_test {
+                    search_venues_mock(search_query()).await
+                } else {
+                    search_venues(search_query(), None, None).await
+                };
+
+                match result {
                     Ok(venues) => {
                         search_results.set(venues);
                         error_message.set(None);
@@ -95,29 +127,65 @@ pub fn ResyView() -> Element {
             if !auth_status() {
                 div {
                     class: "auth-section",
-                    h2 { "Login to Resy" }
-                    p { "Enter your Resy credentials to enable automatic reservation polling." }
+                    h2 { "Resy Authentication" }
                     
-                    input {
-                        r#type: "email",
-                        placeholder: "Email",
-                        value: "{email}",
-                        oninput: move |e| email.set(e.value())
+                    div {
+                        class: "test-mode-section",
+                        style: "background: #fff3cd; padding: 20px; border-radius: 8px; margin-bottom: 20px;",
+                        h3 { "🧪 Test Mode (Recommended)" }
+                        p { "Test the entire system without using your real Resy account or hitting the API." }
+                        ul {
+                            li { "No real API calls - completely safe" }
+                            li { "Simulates all Resy responses with mock data" }
+                            li { "Test booking flow without making real reservations" }
+                        }
+                        button {
+                            onclick: authenticate_test_mode,
+                            style: "background: #28a745; color: white; padding: 12px 24px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px;",
+                            "🧪 Start in Test Mode"
+                        }
                     }
 
-                    input {
-                        r#type: "password",
-                        placeholder: "Password",
-                        value: "{password}",
-                        oninput: move |e| password.set(e.value())
-                    }
+                    div {
+                        class: "real-mode-section",
+                        style: "margin-top: 20px;",
+                        h3 { "🔴 Real Mode (Use Real Account)" }
+                        p { 
+                            style: "color: #dc3545;",
+                            "⚠️ This will use your actual Resy credentials and make real API calls. Use with caution!"
+                        }
+                        
+                        input {
+                            r#type: "email",
+                            placeholder: "Resy Email",
+                            value: "{email}",
+                            oninput: move |e| email.set(e.value()),
+                            style: "display: block; width: 100%; padding: 8px; margin: 8px 0; border: 1px solid #ccc; border-radius: 4px;"
+                        }
 
-                    button {
-                        onclick: authenticate,
-                        "Login & Start Daemon"
+                        input {
+                            r#type: "password",
+                            placeholder: "Resy Password",
+                            value: "{password}",
+                            oninput: move |e| password.set(e.value()),
+                            style: "display: block; width: 100%; padding: 8px; margin: 8px 0; border: 1px solid #ccc; border-radius: 4px;"
+                        }
+
+                        button {
+                            onclick: authenticate,
+                            style: "background: #dc3545; color: white; padding: 12px 24px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px;",
+                            "Login with Real Account & Start Daemon"
+                        }
                     }
                 }
             } else {
+                if test_mode() {
+                    div {
+                        class: "test-mode-banner",
+                        style: "background: #d4edda; color: #155724; padding: 12px; border-radius: 4px; margin-bottom: 16px; border: 1px solid #c3e6cb;",
+                        "🧪 Running in Test Mode - All data is simulated and no real API calls are being made"
+                    }
+                }
                 div {
                     class: "main-content",
                     
