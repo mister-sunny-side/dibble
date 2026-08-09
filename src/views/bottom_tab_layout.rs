@@ -22,6 +22,7 @@ pub fn BottomTabLayout() -> Element {
         let current_route = router.current::<Route>();
         match current_route {
             Route::MapView { .. } => *active_tab.write() = MainTab::MapView,
+            Route::ResyView { .. } => *active_tab.write() = MainTab::Resy,
             Route::AccountView { .. } => *active_tab.write() = MainTab::Account,
             Route::SocialFeedView { .. } => *active_tab.write() = MainTab::SocialFeed,
         }
@@ -34,6 +35,9 @@ pub fn BottomTabLayout() -> Element {
         match tab_clone {
             MainTab::MapView => {
                 router.push(Route::MapView {});
+            }
+            MainTab::Resy => {
+                router.push(Route::ResyView {});
             }
             MainTab::Account => {
                 router.push(Route::AccountView {});

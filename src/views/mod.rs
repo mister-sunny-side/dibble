@@ -20,3 +20,6 @@ pub use account_view::AccountView;
 
 mod social_feed_view;
 pub use social_feed_view::SocialFeedView;
+
+mod resy_view;
+pub use resy_view::ResyView;
